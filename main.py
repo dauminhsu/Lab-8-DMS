@@ -24,12 +24,15 @@ def task1():
         new_img = np.copy(img)
         noise_range = noise_images[file_name]
 
-        pepper = noise < noise_range[0]  # giam -> toi hon, tang -> sang hon
+        # меньше будет темнее, увеличение будет ярче
+        pepper = noise < noise_range[0]
         new_img[pepper] = 0
 
-        salt = noise > noise_range[1]  # giam -> sang hon, tang -> toi hon
+        # меньше будет ярче, увеличение будет темнее
+        salt = noise > noise_range[1]
         new_img[salt] = 255
 
+        # сохранить изображение в файл Noise_images
         cv2.imwrite(f'./noise_images/{file_name}.png', new_img)
 
         # Отображение изображения
@@ -49,13 +52,13 @@ def task2():
         if not ret:
             break
 
-        # Chuyen anh co mau -> anh den trang
+        # Преобразование цветных фотографий в черно-белые
         img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        # Lay do chenh lech la 180 (cang cao thi chenh lech lon moi ve diem)
+        # примите разницу в цвете как 180
         ret, thresh = cv2.threshold(img_gray, 180, 255, cv2.THRESH_BINARY)
 
-        # tim duong vien
+        # найти границу
         contours, _ = cv2.findContours(thresh, cv2.RETR_TREE,
                                        cv2.CHAIN_APPROX_NONE)
 
@@ -85,25 +88,27 @@ def task3():
         if not ret:
             break
 
-        # Chuyen anh co mau -> anh den trang
+        # Преобразование цветных фотографий в черно-белые
         img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         ret, thresh = cv2.threshold(img_gray, 200, 255, cv2.THRESH_BINARY)
-        # tim duong vien
+
+        # найти границу
         contours, _ = cv2.findContours(thresh, cv2.RETR_TREE,
-                                       cv2.CHAIN_APPROX_NONE)  # ?
+                                       cv2.CHAIN_APPROX_NONE)
         img_copy = frame.copy()
 
         for i, contour in enumerate(contours):
-            # Xac mau sac cho vien
-            color = (0, 255, 0)  # Mac dinh la mau xanh la
+            # определить цвет границы
+            # граница по умолчанию сначала зеленая
+            color = (0, 255, 0)
             for j, contour_point in enumerate(contour):
                 if contour_point[0][0] < 50 and contour_point[0][1] < 50:
-                    # To mau xanh lam neu nam o trai tren
+                    # граница становится синей, если метка находится в верхней левой части экрана
                     color = (255, 0, 0)
                     break
                 elif contour_point[0][0] >= img_copy.shape[1] - 50 and contour_point[0][1] >= img_copy.shape[0] - 50:
-                    # To mau do neu nam o phai duoi
+                    # граница становится красной, если значок находится в правом нижнем углу экрана
                     color = (0, 0, 255)
                     break
 
@@ -137,14 +142,14 @@ def task_dop():
         if not ret:
             break
 
-        # Chuyen anh co mau -> anh den trang
+        # Преобразование цветных фотографий в черно-белые
         img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         ret, thresh = cv2.threshold(img_gray, 180, 255, cv2.THRESH_BINARY)
-        # tim duong vien
+        # найти границу
         contours, _ = cv2.findContours(thresh, cv2.RETR_TREE,
                                        cv2.CHAIN_APPROX_NONE)
-
+        # Откройте файл мухи и определите размер мухи
         img_copy = frame.copy()
         fly = cv2.imread("./images/fly64.png", cv2.IMREAD_UNCHANGED)
         fly = cv2.resize(fly, (8, 8))
@@ -154,14 +159,14 @@ def task_dop():
                 x, y = contour_point[0]
                 if y - fly.shape[0] // 2 >= 0 and y + fly.shape[0] // 2 < img_copy.shape[0] and x - fly.shape[1] // 2 >= 0 and x + fly.shape[1] // 2 < img_copy.shape[1]:
                     if (np.min(img_copy[y - fly.shape[0] // 2:y + fly.shape[0] // 2,
-                                        x - fly.shape[1] // 2:x + fly.shape[1] // 2, 3]) == 0):  # neu da ve ruoi roi thi ko thuc hien gi
+                                        x - fly.shape[1] // 2:x + fly.shape[1] // 2, 3]) == 0):  # Если это место было нарисовано мухами, ничего не делайте
                         continue
 
-                    # Neu chua to ruoi thi to con ruoi
+                    # Если у вас нет мухи, нарисуйте ее
                     img_copy[y - fly.shape[0] // 2:y + fly.shape[0] // 2,
                              x - fly.shape[1] // 2:x + fly.shape[1] // 2, :3] = fly[:, :, :3]
 
-                    # Danh dau la da to
+                    # четко обозначьте это место, где была нарисована мушка
                     img_copy[y - fly.shape[0] // 2:y + fly.shape[0] // 2,
                              x - fly.shape[1] // 2:x + fly.shape[1] // 2, 3] = 0
 
