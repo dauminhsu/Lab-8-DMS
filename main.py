@@ -55,54 +55,18 @@ def task2():
         # Преобразование цветных фотографий в черно-белые
         img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        # примите разницу в цвете как 180
         ret, thresh = cv2.threshold(img_gray, 180, 255, cv2.THRESH_BINARY)
 
         # найти границу
         contours, _ = cv2.findContours(thresh, cv2.RETR_TREE,
                                        cv2.CHAIN_APPROX_NONE)
-
-        img_copy = frame.copy()
-        img_copy = cv2.drawContours(
-            img_copy, contours, -1, (0, 255, 0), 2, cv2.LINE_AA)
-
-        cv2.imshow('Task 2', img_copy)
-
-        # Выход из цикла по нажатию клавиши "q"
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    # Освобождение ресурсов
-    cap.release()
-    cv2.destroyAllWindows()
-
-
-def task3():
-    # Создание объекта VideoCapture для захвата видео с камеры
-    cap = cv2.VideoCapture(0)
-
-    # Цикл обработки каждого кадра видео
-    while True:
-        # Получение кадра видео с камеры
-        ret, frame = cap.read()
-        if not ret:
-            break
-
-        # Преобразование цветных фотографий в черно-белые
-        img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-        ret, thresh = cv2.threshold(img_gray, 200, 255, cv2.THRESH_BINARY)
-
-        # найти границу
-        contours, _ = cv2.findContours(thresh, cv2.RETR_TREE,
-                                       cv2.CHAIN_APPROX_NONE)
         img_copy = frame.copy()
 
-        for i, contour in enumerate(contours):
+        for _, contour in enumerate(contours):
             # определить цвет границы
             # граница по умолчанию сначала зеленая
             color = (0, 255, 0)
-            for j, contour_point in enumerate(contour):
+            for _, contour_point in enumerate(contour):
                 if contour_point[0][0] < 50 and contour_point[0][1] < 50:
                     # граница становится синей, если метка находится в верхней левой части экрана
                     color = (255, 0, 0)
@@ -112,14 +76,14 @@ def task3():
                     color = (0, 0, 255)
                     break
 
-            for j, contour_point in enumerate(contour):
+            for _, contour_point in enumerate(contour):
                 cv2.circle(
                     img_copy, ((contour_point[0][0],  contour_point[0][1])), 1, color, 1, cv2.LINE_AA)
 
         cv2.rectangle(img_copy, (0, 0), (50, 50), (255, 0, 0), 1)
         cv2.rectangle(img_copy, (img_copy.shape[1] - 50, img_copy.shape[0] - 50),
                       (img_copy.shape[1], img_copy.shape[0]), (0, 0, 255), 1)
-        cv2.imshow('Task 3', img_copy)
+        cv2.imshow('Task 2', img_copy)
 
         # Выход из цикла по нажатию клавиши "q"
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -184,5 +148,4 @@ def task_dop():
 
 task1()
 task2()
-task3()
 task_dop()
